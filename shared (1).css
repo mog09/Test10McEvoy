@@ -1,0 +1,543 @@
+/* ================================================================
+   McEVOY RACING — SHARED SITE STYLES
+   Design tokens, navigation, global menu, footer, and shared
+   buttons. Linked by every page so a change here updates the
+   whole site at once. Page-specific styles stay in each page's
+   own <style> block.
+================================================================ */
+
+    /* ============================================================
+       DESIGN TOKENS
+    ============================================================ */
+    :root {
+      /* ── Light foundation — Masters-inspired ── */
+      --black:       #1a1a1a;        /* near-black for text                  */
+      --deep:        #ffffff;        /* section backgrounds: white            */
+      --charcoal:    #f0efed;        /* alternate section: off-white          */
+      --mid:         #e2e0dc;        /* borders, dividers                     */
+      --warm-grey:   #4a4a45;        /* secondary text                        */
+      --light-grey:  #333330;        /* body text                             */
+      --parchment:   #ffffff;        /* card backgrounds: white               */
+      --cream:       #f4f4f2;        /* page background: warm white           */
+      --white:       #ffffff;
+
+      /* ── Accent: Racing Orange ── */
+      --gold:        #e8621a;        /* primary accent — vivid orange        */
+      --gold-light:  #f08040;        /* hover / lighter orange               */
+      --gold-dark:   #b84a10;        /* pressed / darker orange              */
+      --racing-red:  #c0392b;        /* result red (scratch etc)             */
+
+      /* ── Dark surfaces (nav, hero, menu) ── */
+      --nav-dark:    #111111;        /* nav background when scrolled         */
+      --hero-dark:   #0d0d0d;        /* hero overlay colour                  */
+      --section-dark:#1c1c1a;        /* dark section variant                 */
+
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-title:   'Barlow Condensed', sans-serif;   /* section titles — powerful, condensed */
+      --font-body:    'Raleway', sans-serif;
+
+      /* Type scale — applied consistently everywhere (bumped up for readability) */
+      --text-label:   0.85rem;    /* overlines, badges, all-caps labels  */
+      --text-ui:      0.9rem;     /* buttons, nav items, form labels      */
+      --text-body:    1.05rem;    /* paragraphs, descriptions             */
+      --text-sub:     1rem;       /* secondary info, race details         */
+
+      /* Letter spacing standards */
+      --ls-caps:      0.32em;     /* ALL CAPS ui text                     */
+      --ls-wide:      0.22em;     /* wide-tracked labels                  */
+      --ls-body:      0.04em;     /* readable body text                   */
+      --ls-tight:     0.01em;     /* display headings                     */
+
+      --nav-h: 90px;
+      --transition: 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    /* ============================================================
+       RESET & BASE
+    ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--cream);
+      color: var(--white);
+      font-family: var(--font-body);
+      font-weight: 300;
+      font-size: 18px;
+      letter-spacing: var(--ls-body);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+    button { background: none; border: none; cursor: pointer; font-family: inherit; color: inherit; }
+
+    /* ============================================================
+       UTILITY
+    ============================================================ */
+    .visually-hidden {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap;
+    }
+    .gold-rule {
+      display: block; width: 48px; height: 1px;
+      background: var(--gold); margin: 0 auto 2rem; /* orange rule */
+    }
+
+    /* ============================================================
+       CUSTOM CURSOR
+    ============================================================ */
+    * { cursor: none !important; }
+    .cursor {
+      position: fixed; z-index: 9999; pointer-events: none;
+      top: 0; left: 0;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--gold);
+      transform: translate(-50%, -50%);
+      transition: width 0.2s ease, height 0.2s ease, background 0.2s ease;
+      will-change: left, top;
+    }
+    .cursor-ring {
+      position: fixed; z-index: 9998; pointer-events: none;
+      top: 0; left: 0;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      border: 1px solid rgba(232,98,26,0.35);
+      transform: translate(-50%, -50%);
+      transition: width 0.25s cubic-bezier(0.25,0.46,0.45,0.94),
+                  height 0.25s cubic-bezier(0.25,0.46,0.45,0.94),
+                  border-color 0.25s ease;
+      will-change: left, top;
+    }
+    body.cursor-hover .cursor-ring {
+      width: 38px; height: 38px;
+      border-color: rgba(232,98,26,0.55);
+    }
+    body.cursor-hover .cursor {
+      width: 5px; height: 5px;
+      background: var(--gold);
+    }
+    body.cursor-click .cursor-ring {
+      width: 16px; height: 16px;
+      border-color: rgba(232,98,26,1);
+      transition-duration: 0.08s;
+    }
+
+
+    /* ============================================================
+       NAVIGATION — clean centred RR-style
+    ============================================================ */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      transition: background var(--transition);
+      background: rgba(10,10,8,0.85);
+      backdrop-filter: blur(12px);
+    }
+    /* Always has a solid background so ticker can never show through */
+    .nav-inner {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      height: var(--nav-h);
+      padding: 0 2.8rem;
+      background: transparent;
+      position: relative;
+      z-index: 100;
+    }
+    .nav.scrolled .nav-inner {
+      background: rgba(255,255,255,0.98);
+      box-shadow: 0 2px 0 var(--mid);
+    }
+    .nav.scrolled {
+      background: rgba(255,255,255,0.98);
+      backdrop-filter: blur(16px);
+    }
+    .nav-keyline {
+      height: 1px;
+      background: rgba(255,255,255,0.25);
+      margin: 0 2.8rem;
+      transition: opacity var(--transition);
+      position: relative; z-index: 100;
+    }
+    .nav.scrolled .nav-keyline { opacity: 0; }
+    .nav.scrolled .nav-menu-btn,
+    .nav.scrolled .nav-dealer-btn { color: var(--black); }
+    .nav.scrolled .nav-hamburger span { background: var(--black); }
+    .nav.scrolled .nav-dealer-icon { border-color: rgba(0,0,0,0.3); }
+    .nav.scrolled .nav-logo svg path,
+    .nav.scrolled .nav-logo svg rect,
+    .nav.scrolled .nav-logo svg text { fill: var(--black); }
+
+    /* LEFT */
+    .nav-left { display: flex; align-items: center; }
+    .nav-menu-btn {
+      display: flex; align-items: center; gap: 0.75rem;
+      font-family: var(--font-body);
+      font-size: var(--text-ui); font-weight: 400;
+      letter-spacing: var(--ls-caps); text-transform: uppercase;
+      color: var(--white); transition: opacity 0.25s;
+    }
+    .nav-menu-btn:hover { opacity: 0.6; }
+    .nav-hamburger { display: flex; flex-direction: column; gap: 4px; }
+    .nav-hamburger span { display: block; width: 18px; height: 1px; background: var(--white); }
+
+    /* CENTRE */
+    .nav-logo {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 2px;
+    }
+
+    /* RIGHT */
+    .nav-right { display: flex; align-items: center; justify-content: flex-end; }
+    .nav-dealer-btn {
+      display: flex; align-items: center; gap: 0.65rem;
+      font-family: var(--font-body);
+      font-size: var(--text-ui); font-weight: 400;
+      letter-spacing: var(--ls-caps); text-transform: uppercase;
+      color: var(--white); transition: opacity 0.25s;
+    }
+    .nav-dealer-btn:hover { opacity: 0.6; }
+    .nav-dealer-icon {
+      width: 15px; height: 15px;
+      border: 1px solid rgba(255,255,255,0.55);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.855rem; line-height: 1;
+    }
+
+    /* Mobile toggle — hidden on desktop */
+    .nav-mobile-only { display: none; }
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    .footer {
+      background: var(--section-dark);
+      border-top: none;
+      padding: 6rem clamp(2rem, 7vw, 8rem) 3.5rem;
+    }
+    .footer-top {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      gap: 4rem; margin-bottom: 5rem;
+    }
+    .footer-brand {}
+    .footer-logo-name {
+      font-family: var(--font-display);
+      font-size: 1.8rem; font-weight: 400; letter-spacing: 0.05em;
+      color: var(--white); margin-bottom: 0.4rem; /* footer stays dark */
+    }
+    .footer-logo-sub {
+      font-family: var(--font-body); font-size: var(--text-label); font-weight: 400; letter-spacing: var(--ls-caps);
+      text-transform: uppercase; color: var(--gold); margin-bottom: 1.5rem;
+    }
+    .footer-tagline {
+      font-family: var(--font-display);
+      font-size: 1.25rem; font-style: italic;
+      color: var(--white); line-height: 1.6;
+    }
+    .footer-col-title {
+      font-family: var(--font-body); font-size: var(--text-label); font-weight: 400; letter-spacing: var(--ls-caps);
+      text-transform: uppercase; color: var(--gold);
+      margin-bottom: 1.5rem;
+    }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 0.7rem; }
+    .footer-links a {
+      font-family: var(--font-body); font-size: 1.05rem; font-weight: 300; letter-spacing: var(--ls-body); color: var(--white);
+      transition: color 0.25s;
+    }
+    .footer-links a:hover { color: var(--gold); }
+
+    .footer-social {
+      display: flex; gap: 1rem; margin-top: 1.5rem;
+    }
+    .footer-social a {
+      width: 36px; height: 36px;
+      border: 1px solid rgba(255,255,255,0.25);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; color: var(--white);
+      transition: border-color 0.25s, color 0.25s;
+    }
+    .footer-social a:hover { border-color: var(--gold); color: var(--gold); }
+
+    .footer-bottom {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    .footer-copy {
+      font-family: var(--font-body); font-size: 0.9rem; font-weight: 300; letter-spacing: var(--ls-body);
+      color: var(--white);
+    }
+    .footer-legal {
+      display: flex; gap: 2rem;
+    }
+    .footer-legal a {
+      font-family: var(--font-body); font-size: 0.9rem; font-weight: 300; letter-spacing: var(--ls-body);
+      color: var(--white); transition: color 0.25s;
+    }
+    .footer-legal a:hover { color: var(--gold); }
+
+
+    /* ============================================================
+       GLOBAL MENU OVERLAY — RR glass style
+    ============================================================ */
+    .global-menu {
+      position: fixed; inset: 0; z-index: 200;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.55s cubic-bezier(0.25,0.46,0.45,0.94);
+    }
+    .global-menu.open {
+      opacity: 1; pointer-events: all;
+    }
+
+    /* Left panel — frosted glass, content visible behind */
+    .menu-left {
+      position: relative;
+      background: rgba(8,8,6,0.72);
+      backdrop-filter: blur(28px) saturate(0.7);
+      -webkit-backdrop-filter: blur(28px) saturate(0.7);
+      display: flex; flex-direction: column;
+      justify-content: center;
+      padding: 0 0 0 clamp(3rem, 8vw, 8rem);
+      transform: translateX(-24px);
+      transition: transform 0.55s cubic-bezier(0.25,0.46,0.45,0.94);
+    }
+    .global-menu.open .menu-left {
+      transform: translateX(0);
+    }
+
+    /* Right panel — transparent, click anywhere here to close the menu */
+    .menu-right {
+      position: relative;
+      background: transparent;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    /* "close" hint that appears on hover */
+    .menu-right::after {
+      content: 'Click to close';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: var(--font-body);
+      font-size: 0.832rem; font-weight: 400;
+      letter-spacing: 0.28em; text-transform: uppercase;
+      color: rgba(255,255,255,0.98);
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .menu-right:hover::after {
+      opacity: 1;
+    }
+    .menu-right:hover {
+      background: rgba(5,5,4,0.12);
+    }
+    /* Thin vertical divider */
+    .menu-right::before {
+      content: '';
+      position: absolute; top: 5rem; left: 0; bottom: 3rem;
+      width: 1px;
+      background: rgba(255,255,255,0.08);
+    }
+
+    /* TOP BAR inside menu */
+    .menu-topbar {
+      position: absolute; top: 0; left: 0; right: 0;
+      height: var(--nav-h);
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      padding: 0 2.8rem;
+      background: #0a0a08;
+      z-index: 2;
+    }
+    .menu-close-btn {
+      display: flex; align-items: center; gap: 0.75rem;
+      font-family: var(--font-body);
+      font-size: var(--text-ui); font-weight: 400;
+      letter-spacing: var(--ls-caps); text-transform: uppercase;
+      color: rgba(255,255,255,0.95);
+      transition: color 0.25s, opacity 0.25s;
+      grid-column: 1;
+    }
+    .menu-close-btn:hover { color: var(--white); }
+    .menu-close-x {
+      width: 14px; height: 14px; position: relative;
+      flex-shrink: 0;
+    }
+    .menu-close-x::before,
+    .menu-close-x::after {
+      content: ''; position: absolute;
+      width: 100%; height: 1px;
+      background: currentColor; top: 50%; left: 0;
+    }
+    .menu-close-x::before { transform: rotate(45deg); }
+    .menu-close-x::after  { transform: rotate(-45deg); }
+
+    .menu-logo {
+      grid-column: 2;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .menu-logo svg { height: 36px; width: auto; }
+    /* Keyline under topbar */
+    .menu-topbar-keyline {
+      position: absolute; top: var(--nav-h); right: 0;
+      width: 50%; height: 1px;
+      background: rgba(255,255,255,0.12);
+    }
+
+    /* NAV LINKS */
+    .menu-nav {
+      display: flex; flex-direction: column;
+      gap: 0.15rem;
+      /* Stagger animation targets */
+    }
+    .menu-nav-item {
+      display: block;
+      font-family: var(--font-body);
+      font-size: clamp(1.6rem, 1.8vw, 1.8rem);
+      font-weight: 700;
+      letter-spacing: var(--ls-caps);
+      text-transform: uppercase;
+      color: rgba(255,255,255,1);
+      padding: 0.85rem 0;
+      border: none; background: none; text-align: left;
+      transition: color 0.3s ease, letter-spacing 0.3s ease;
+      /* staggered slide-in */
+      transform: translateX(-18px);
+      opacity: 0;
+      transition: color 0.3s ease, letter-spacing 0.3s ease,
+                  transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94),
+                  opacity 0.5s ease;
+    }
+    .global-menu.open .menu-nav-item {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    /* Stagger delays */
+    .global-menu.open .menu-nav-item:nth-child(1) { transition-delay: 0.08s; }
+    .global-menu.open .menu-nav-item:nth-child(2) { transition-delay: 0.14s; }
+    .global-menu.open .menu-nav-item:nth-child(3) { transition-delay: 0.20s; }
+    .global-menu.open .menu-nav-item:nth-child(4) { transition-delay: 0.26s; }
+    .global-menu.open .menu-nav-item:nth-child(5) { transition-delay: 0.32s; }
+    .global-menu.open .menu-nav-item:nth-child(6) { transition-delay: 0.38s; }
+    .global-menu.open .menu-nav-item:nth-child(7) { transition-delay: 0.44s; }
+
+    /* Alternating orange / blue hover */
+    .menu-nav-item:nth-child(odd):hover  { color: #e8621a; letter-spacing: 0.38em; }
+    .menu-nav-item:nth-child(even):hover { color: #2d67c3; letter-spacing: 0.38em; }
+    /* Active/current */
+    .menu-nav-item.active {
+      color: rgba(255,255,255,1);
+    }
+
+
+    /* ============================================================
+       GLOBAL BUTTON SYSTEM — McEvoy brand colours
+    ============================================================ */
+    :root {
+      --btn-blue:       #2d67c3;
+      --btn-blue-hover: #F77509;
+      --btn-off-white:  #F4F5F5;
+    }
+
+    /* Primary — McEvoy Blue → hover Orange */
+    .btn-mcevoy-primary {
+      display: inline-flex; align-items: center; gap: 0.75rem;
+      font-family: var(--font-body);
+      font-size: var(--text-ui); font-weight: 500;
+      letter-spacing: var(--ls-wide); text-transform: uppercase;
+      padding: 1rem 2.2rem;
+      background: var(--btn-blue); color: var(--btn-off-white);
+      border: none; border-radius: 8px;
+      transition: background 0.28s ease, transform 0.2s ease;
+      cursor: pointer;
+    }
+    .btn-mcevoy-primary:hover { background: var(--btn-blue-hover); transform: translateY(-2px); }
+    .btn-mcevoy-primary .btn-arrow { transition: transform 0.25s; }
+    .btn-mcevoy-primary:hover .btn-arrow { transform: translateX(4px); }
+
+    /* Secondary ghost — blue border, blue text → hover fill orange */
+    .btn-mcevoy-ghost {
+      display: inline-flex; align-items: center; gap: 0.75rem;
+      font-family: var(--font-body);
+      font-size: var(--text-ui); font-weight: 400;
+      letter-spacing: var(--ls-wide); text-transform: uppercase;
+      padding: 0.9rem 2rem;
+      background: transparent; color: var(--btn-blue);
+      border: 1px solid var(--btn-blue); border-radius: 8px;
+      transition: background 0.28s ease, color 0.28s ease, border-color 0.28s ease;
+      cursor: pointer;
+    }
+    .btn-mcevoy-ghost:hover {
+      background: var(--btn-blue-hover);
+      border-color: var(--btn-blue-hover);
+      color: var(--btn-off-white);
+    }
+
+    /* Small variant */
+    .btn-mcevoy-sm {
+      padding: 0.65rem 1.3rem;
+      font-size: 0.866rem;
+      border-radius: 6px;
+    }
+
+    /* Update existing .btn-primary and .syndicate-cta-btn to McEvoy Blue */
+    .btn-primary {
+      background: var(--btn-blue) !important;
+      color: var(--btn-off-white) !important;
+      border-radius: 8px;
+    }
+    .btn-primary:hover { background: var(--btn-blue-hover) !important; }
+    .syndicate-cta-btn { background: var(--btn-blue) !important; color: var(--btn-off-white) !important; }
+    .syndicate-cta-btn:hover { background: var(--btn-blue-hover) !important; }
+    .form-submit { background: var(--btn-blue) !important; }
+    .form-submit:hover { background: var(--btn-blue-hover) !important; }
+    .careers-compact-btn { background: var(--btn-blue) !important; }
+    .careers-compact-btn:hover { background: var(--btn-blue-hover) !important; }
+    .position-apply-btn { background: var(--btn-blue) !important; }
+    .position-apply-btn:hover { background: var(--btn-blue-hover) !important; }
+
+
+/* ── Mobile: shared nav / menu / footer tweaks ── */
+
+    /* ── NAVIGATION MOBILE — hamburger tap target ── */
+    .nav-menu-btn, .nav-dealer-btn {
+      min-height: 44px;
+      padding: 0.5rem 0;
+    }
+
+    /* ── FOOTER — mobile fixes ── */
+    @media (max-width: 480px) {
+      .footer { padding: 3.5rem 1.5rem 2rem; }
+      .footer-top { grid-template-columns: 1fr; gap: 2rem; }
+      .footer-legal { flex-wrap: wrap; gap: 1rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+      html { scroll-behavior: auto; }
+    }
+
+    /* ── MOBILE CURSOR — hide custom cursor on touch ── */
+    @media (hover: none) {
+      * { cursor: auto !important; }
+      .cursor, .cursor-ring { display: none; }
+    }
+
+    /* ── GLOBAL MENU MOBILE ── */
+    @media (max-width: 768px) {
+      .global-menu { grid-template-columns: 1fr; }
+      .menu-right { display: none; }
+      .menu-left { padding: 0 2rem 2rem; justify-content: flex-start; padding-top: calc(var(--nav-h) + 2.5rem); }
+      .menu-nav-item { font-size: 1.05rem; padding: 0.9rem 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+      .menu-topbar { padding: 0 1.5rem; }
+      .menu-logo svg { height: 20px !important; }
+    }
+
